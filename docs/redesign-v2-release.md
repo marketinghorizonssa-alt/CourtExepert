@@ -28,4 +28,4 @@ The expanded script fails unless the required assets/font exist, 13 pages exist,
 
 ## Release lineage
 - Prepared V2 commit: `5c263f212f4ab790285b2078e24a9f155b404929`.
-- Deployment must use a main-branch descendant that contains `redesign-v2.sh` and `redesign-v2.sh.gz` and passes checksum verification.
+- Deployment must use a main-branch descendant containing the verified package and passing checksum verification.
