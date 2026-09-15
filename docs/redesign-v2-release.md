@@ -27,5 +27,5 @@ This release upgrades the campaign site visual system while preserving the verif
 The expanded script fails unless the required assets/font exist, 13 pages exist, sitemap contains 13 URLs, the large logo and Google Maps are present, local font CSS is present, GTM is present, and the canonical form-success event remains in `app.js`.
 
 ## Release lineage
-- Verified package tree/commit is attached to `main` through commit `81ba69f70c344f4de409391f2f08c626b9f4ce54`.
-- Deploy the exact current descendant after main read-back confirms `redesign-v2.sh` and `redesign-v2.sh.gz` exist.
+- Prepared V2 commit: `5c263f212f4ab790285b2078e24a9f155b404929`.
+- Deployment must use a main-branch descendant that contains `redesign-v2.sh` and `redesign-v2.sh.gz` and passes checksum verification.
