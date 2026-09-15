@@ -14,3 +14,4 @@ printf '%s  %s\n' '2bdbc7cd2fa04a29033c8e57a23f2a06dc68b46e3c6e839db5422e3c4cbac
 sh -n "$OUT"
 sh "$OUT" "$SHA"
 curl -fsSL "$RAW/redesign-v2-polish.sh" | sh -s "$SHA"
+curl -fsSL "$RAW/performance-polish.sh" | sh -s "$SHA"
