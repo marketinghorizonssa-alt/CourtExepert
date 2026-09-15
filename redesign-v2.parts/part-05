@@ -1,0 +1,32 @@
+تحكيم' 'خدمات قانونية للنزاعات التجارية والعقود والتحكيم والتسويات في الرياض.' 'نزاعات تجارية' 'صياغة العقود' 'التحكيم' 'التسويات'
+service_page 'real-estate-law' 'محامي عقاري وصياغة وتوثيق عقود في الرياض' 'عقارات وتوثيق' 'خدمات قانونية عقارية في الرياض تشمل النزاعات والعقود والإيجارات والصكوك والتوثيق.' 'نزاعات عقارية' 'عقود وإيجارات' 'الصكوك' 'التوثيق'
+service_page 'criminal-specialized' 'محامي جنائي وخدمات قانونية متخصصة في الرياض' 'جنائي وخدمات متخصصة' 'خدمات قانونية للقضايا الجنائية والجرائم الإلكترونية والأخطاء الطبية والمسائل المتخصصة في الرياض.' 'قضايا جنائية' 'جرائم إلكترونية' 'أخطاء طبية' 'مسائل بنكية'
+
+cat > "$ROOT/privacy/index.html" <<EOF_PRIV
+$(head_html 'سياسة الخصوصية | كورت إكسبرت' 'سياسة خصوصية طلبات التواصل في موقع كورت إكسبرت.' "$DOMAIN/privacy/")
+$(nav_html)
+<main id="main"><section class="section"><div class="c privacy"><div class="section-label">الخصوصية</div><h1>سياسة الخصوصية</h1><p>نجمع الاسم ورقم الجوال ونوع الخدمة وملخص الطلب ومعلومات الإسناد الإعلاني عند توفرها لغرض التواصل ومعالجة الطلب وقياس أداء الحملات.</p><h2>استخدام البيانات</h2><p>تستخدم البيانات لتوجيه الطلب للقسم المناسب والرد عليه وتحسين القياس ومنع إساءة استخدام النموذج، ولا نضع بياناتك الشخصية في روابط التحويل.</p><h2>الموافقة</h2><p>إرسال النموذج يعني الموافقة على استخدام البيانات للأغراض الموضحة في هذه السياسة.</p><h2>التواصل</h2><p>للاستفسارات المتعلقة بالخصوصية: <a href="mailto:$EMAIL">$EMAIL</a>.</p></div></section></main>
+$(footer_html)
+<script src="/assets/app.js" defer></script></body></html>
+EOF_PRIV
+
+# Tracking stays single-source: page emits confirmed form success only; GTM listener owns Call/WhatsApp clicks.
+curl -fsSL "$RAW/tracking-upgrade.sh" | sh -s "$SHA"
+# SEO / robots / llms hardening after all routes exist.
+curl -fsSL "$RAW/seo-hardening.sh" | sh -s "$SHA"
+
+# Final read-back gates.
+test -s "$ROOT/assets/logo-main.png"
+test -s "$ROOT/assets/hero-main.jpg"
+test -s "$ROOT/assets/about-portrait.jpg"
+test -s "$ROOT/assets/about-wide.jpg"
+test -s "$ROOT/assets/fonts/noto-arabic-tight-subset.woff2"
+test "$(find "$ROOT" -maxdepth 2 -name index.html -type f | wc -l)" -eq 13
+test "$(grep -o '<url>' "$ROOT/sitemap.xml" | wc -l)" -eq 13
+grep -Fq 'logo-main.png' "$ROOT/index.html"
+grep -Fq 'google.com/maps' "$ROOT/index.html"
+grep -Fq 'noto-arabic-tight-subset.woff2' "$ROOT/assets/styles.css"
+grep -Fq 'GTM-M9ZK36MB' "$ROOT/index.html"
+grep -Fq 'lead_form_success' "$ROOT/assets/app.js"
+printf '%s\n' "$SHA" > "$ROOT/RELEASE"
+printf 'CORTS_V2_OK:%s\n' "$SHA"
