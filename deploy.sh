@@ -2,39 +2,47 @@
 set -eu
 SHA="${1:?commit sha required}"
 ROOT="/home/u878466595/domains/hositee.com/public_html/corts-expert"
-TMP="/home/u878466595/.corts-deploy-${SHA}"
-ZIP="/home/u878466595/.corts-${SHA}.zip"
-URL="https://codeload.github.com/marketinghorizonssa-alt/CourtExepert/zip/${SHA}"
-PORT=3999
-rm -rf "$TMP" "$ZIP"
-mkdir -p "$TMP" "$ROOT"
-curl -fsSL "$URL" -o "$ZIP"
-unzip -q "$ZIP" -d "$TMP"
-SRC=$(find "$TMP" -mindepth 1 -maxdepth 1 -type d | head -n 1)
-test -f "$SRC/server.js"
-test -f "$SRC/public/styles.css"
-test -f "$SRC/public/app.js"
-rm -rf "$ROOT"/*
+DOMAIN="https://cortsexpert.hositee.com"
+PHONE="0556044425"
+TEL="+966556044425"
+WA="966556044425"
+EMAIL="info@corts-e.sa"
+GTM="GTM-M9ZK36MB"
 mkdir -p "$ROOT/assets"
-cp -f "$SRC/public/styles.css" "$ROOT/assets/styles.css"
-cp -f "$SRC/public/app.js" "$ROOT/assets/app.js"
-cd "$SRC"
-PORT=$PORT node server.js > "$TMP/server.log" 2>&1 &
-PID=$!
-trap 'kill $PID 2>/dev/null || true; rm -rf "$TMP" "$ZIP"' EXIT
-n=0
-until curl -fsS "http://127.0.0.1:$PORT/healthz" >/dev/null 2>&1; do
-  n=$((n+1)); [ "$n" -ge 15 ] && { cat "$TMP/server.log"; exit 1; }; sleep 1
-done
-for p in / /riyadh-lawyer/ /legal-consultation/ /labor-law/ /debt-collection-execution/ /trademark-intellectual-property/ /family-inheritance/ /business-commercial-law/ /real-estate-law/ /criminal-specialized/ /privacy/; do
-  if [ "$p" = "/" ]; then out="$ROOT/index.html"; else dir="$ROOT${p}"; mkdir -p "$dir"; out="${dir}index.html"; fi
-  curl -fsS "http://127.0.0.1:$PORT$p" -o "$out"
-  test -s "$out"
-done
-curl -fsS "http://127.0.0.1:$PORT/robots.txt" -o "$ROOT/robots.txt"
-curl -fsS "http://127.0.0.1:$PORT/sitemap.xml" -o "$ROOT/sitemap.xml"
+cat > "$ROOT/assets/styles.css" <<'CSS'
+:root{--n:#1b3461;--g:#be9a5f;--bg:#f7f5f1;--t:#172033;--m:#667085}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;direction:rtl;font-family:Tahoma,Arial,sans-serif;color:var(--t);line-height:1.75}a{color:inherit}.c{width:min(1160px,calc(100% - 28px));margin:auto}.top{background:#0d2348;color:#fff;font-size:13px;padding:7px 0}.top .c,.nav{display:flex;justify-content:space-between;align-items:center;gap:18px}.head{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid #eee}.nav{height:76px}.logo{font-weight:900;color:var(--n);text-decoration:none;font-size:21px}.logo span{color:var(--g)}.links{display:flex;gap:18px;align-items:center}.links a{text-decoration:none;font-weight:700;font-size:14px}.cta{background:var(--g);color:#fff!important;padding:10px 17px;border-radius:999px}.hero{background:linear-gradient(120deg,#0a1933f0,#1b3461dd);min-height:620px;display:flex;align-items:center}.hero .c{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}.copy{color:#fff;padding:50px 0}.tag{display:inline-block;border:1px solid #d2b47f;color:#f2d6a5;border-radius:999px;padding:5px 11px;font-size:13px}.copy h1{font-size:clamp(34px,4.5vw,58px);line-height:1.18;color:#d0aa69;margin:16px 0}.copy p{font-size:18px}.points{display:grid;grid-template-columns:1fr 1fr;gap:7px}.points span:before{content:'✓';color:#e3c38d;margin-left:7px}.form{background:#fff;padding:22px;border-radius:22px;box-shadow:0 20px 60px #0005}.form h2{color:var(--n);margin:0}.sub{font-size:13px;color:var(--m);margin-bottom:12px}.field{margin:10px 0}.field label{display:block;font-size:13px;font-weight:700}.field input,.field select,.field textarea{width:100%;padding:11px;border:1px solid #dfe3e9;border-radius:10px;font:inherit}.field textarea{min-height:80px}.cons{font-size:12px;color:var(--m);display:flex;gap:7px}.btn{width:100%;border:0;background:var(--n);color:#fff;padding:12px;border-radius:10px;font:inherit;font-weight:800;cursor:pointer}.msg{display:none;margin-top:8px;padding:8px;border-radius:8px;font-size:13px}.msg.ok{display:block;background:#e8f7ee;color:#08743d}.msg.err{display:block;background:#fff0f0;color:#a12a2a}section{padding:68px 0}.soft{background:var(--bg)}.sh{text-align:center;max-width:760px;margin:0 auto 30px}.sh b{color:var(--g)}.sh h2{color:var(--n);font-size:clamp(28px,3vw,40px);line-height:1.3;margin:5px}.sh p{color:var(--m)}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{border:1px solid #e8e3db;border-radius:18px;padding:21px;background:#fff}.card i{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:#f4ede1;color:var(--g);font-style:normal;font-weight:900}.card h3{color:var(--n);margin:12px 0 5px}.card p{color:var(--m);font-size:14px}.foot{background:#0b1c38;color:#dbe4f3;padding:45px 0 18px}.fg{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:25px}.fg h3{color:#fff}.fg a{display:block;text-decoration:none;margin:6px 0}.copyr{border-top:1px solid #ffffff20;text-align:center;margin-top:25px;padding-top:14px;font-size:12px}.float{position:fixed;left:15px;bottom:15px;display:grid;gap:9px;z-index:40}.float a{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;text-decoration:none;font-weight:900;box-shadow:0 8px 20px #0004}.wa{background:#168a55}.call{background:var(--n)}.crumb{background:var(--bg);padding:8px 0;font-size:13px}.privacy{max-width:900px}.privacy h1,.privacy h2{color:var(--n)}@media(max-width:900px){.links{display:none}.hero .c{grid-template-columns:1fr}.copy{padding:55px 0 15px}.form{margin-bottom:45px}.cards{grid-template-columns:1fr 1fr}.fg{grid-template-columns:1fr 1fr}}@media(max-width:620px){.top .c{justify-content:center}.top .addr{display:none}.hero{min-height:auto}.copy h1{font-size:34px}.points,.cards,.fg{grid-template-columns:1fr}section{padding:50px 0}.form{padding:17px}.float a{width:48px;height:48px}}
+CSS
+cat > "$ROOT/assets/app.js" <<'JS'
+(()=>{const dl=window.dataLayer=window.dataLayer||[];document.querySelectorAll('a[data-event]').forEach(a=>a.addEventListener('click',()=>dl.push({event:a.dataset.event,link_url:a.href,landing_path:location.pathname}),{passive:true}));const qs=new URLSearchParams(location.search),attrs=['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','gbraid','wbraid'];document.querySelectorAll('form[data-lead-form]').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();const btn=form.querySelector('button'),msg=form.querySelector('.msg'),fd=new FormData(form),p=Object.fromEntries(fd.entries());attrs.forEach(k=>p[k]=qs.get(k)||'');p.landing_path=location.pathname;p.privacy_consent=fd.get('privacy_consent')?'yes':'no';if(p.privacy_consent!=='yes')return;const ph=String(p.phone||'').replace(/[\s()-]/g,'');if(!/^(?:\+?966|0)?5\d{8}$/.test(ph)){msg.className='msg err';msg.textContent='أدخل رقم جوال سعودي صحيح';return}btn.disabled=true;const old=btn.textContent;btn.textContent='جاري الإرسال...';try{const r=await fetch('https://formsubmit.co/ajax/info@corts-e.sa',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({...p,phone:ph,_captcha:'false',_template:'table',_subject:'طلب جديد من موقع كورت إكسبرت للحملات'})});if(!r.ok)throw 0;form.reset();const c=form.querySelector('[name=privacy_consent]');if(c)c.checked=true;msg.className='msg ok';msg.textContent='تم استلام طلبك بنجاح.';dl.push({event:'lead_form_success',service:p.service||'',landing_path:p.landing_path})}catch{msg.className='msg err';msg.textContent='تعذر الإرسال الآن، استخدم الاتصال أو واتساب.'}finally{btn.disabled=false;btn.textContent=old}}))})();
+JS
+make_page(){ slug="$1"; title="$2"; subtitle="$3"; items="$4"; if [ "$slug" = "/" ]; then dir="$ROOT"; canonical="$DOMAIN/"; else dir="$ROOT$slug"; canonical="$DOMAIN$slug"; fi; mkdir -p "$dir"; cat > "$dir/index.html" <<EOF
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>$title | كورت إكسبرت</title><meta name="description" content="$subtitle في الرياض من كورت إكسبرت"><link rel="canonical" href="$canonical"><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':Date.now(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i;f.parentNode.insertBefore(j,f)})(window,document,'script','dataLayer','$GTM');</script><link rel="stylesheet" href="/assets/styles.css"></head><body><div class="top"><div class="c"><span class="addr">الرياض - المروة - تقاطع الإمام مسلم مع ابن تيمية</span><span><a data-event="click_call" href="tel:$TEL">$PHONE</a> · $EMAIL</span></div></div><header class="head"><div class="c nav"><a class="logo" href="/">كورت <span>إكسبرت</span></a><nav class="links"><a href="/">الرئيسية</a><a href="/riyadh-lawyer/">محامي الرياض</a><a href="/legal-consultation/">الاستشارات</a><a class="cta" href="#lead">اطلب استشارة</a></nav></div></header><main><section class="hero"><div class="c"><div class="copy"><span class="tag">كورت إكسبرت · الرياض</span><h1>$title</h1><p>$subtitle</p><div class="points">$items</div></div><div class="form" id="lead"><h2>اطلب تواصلًا قانونيًا</h2><div class="sub">أرسل بيانات مختصرة وسيتم توجيه طلبك للقسم المناسب.</div><form data-lead-form><div class="field"><label>الاسم</label><input name="name" autocomplete="name" required></div><div class="field"><label>رقم الجوال</label><input name="phone" type="tel" inputmode="tel" placeholder="05xxxxxxxx" required></div><div class="field"><label>نوع الخدمة</label><input name="service" value="$title" required></div><div class="field"><label>ملخص الطلب</label><textarea name="message" maxlength="1500"></textarea></div><label class="cons"><input type="checkbox" name="privacy_consent" value="yes" checked required>أوافق على <a href="/privacy/">سياسة الخصوصية</a></label><button class="btn" type="submit">إرسال الطلب</button><div class="msg" role="status"></div></form></div></div></section><section><div class="c"><div class="sh"><b>كورت إكسبرت</b><h2>خدمة قانونية متخصصة في الرياض</h2><p>الصفحة مخصصة لنية البحث والإعلان لرفع الملاءمة وتسهيل التواصل.</p></div></div></section></main><footer class="foot"><div class="c fg"><div><h3>كورت إكسبرت للمحاماة والاستشارات القانونية</h3><p>بوابتكم إلى العدالة والحلول القانونية الفعّالة.</p></div><div><h3>تواصل</h3><a data-event="click_call" href="tel:$TEL">$PHONE</a><a data-event="click_whatsapp" href="https://wa.me/$WA">واتساب</a><a href="mailto:$EMAIL">$EMAIL</a></div><div><h3>روابط</h3><a href="/privacy/">سياسة الخصوصية</a></div></div><div class="c copyr">© 2026 كورت إكسبرت</div></footer><div class="float"><a class="wa" data-event="click_whatsapp" href="https://wa.me/$WA">W</a><a class="call" data-event="click_call" href="tel:$TEL">☎</a></div><script src="/assets/app.js" defer></script></body></html>
+EOF
+}
+make_page / "كورت إكسبرت للمحاماة والاستشارات القانونية" "خدمات قانونية واستشارات وتمثيل للأفراد والمنشآت في الرياض" "<span>استشارات قانونية</span><span>ترافع وتمثيل</span><span>شركات وعقود</span><span>قضايا ومطالبات</span>"
+make_page /riyadh-lawyer/ "محامي في الرياض للاستشارات والتمثيل القانوني" "محامي الرياض ومكتب محاماة ومستشار قانوني" "<span>استشارات قانونية</span><span>ترافع وتمثيل</span><span>مراجعة العقود</span><span>تحديد المسار القانوني</span>"
+make_page /legal-consultation/ "استشارات قانونية في الرياض للأفراد والمنشآت" "استشارة محامي ومستشار قانوني" "<span>تحليل الوقائع</span><span>رأي قانوني</span><span>مراجعة العقود</span><span>توجيه للإجراء التالي</span>"
+make_page /labor-law/ "محامي قضايا عمالية ومكتب العمل في الرياض" "محامي عمالي والمحكمة العمالية ومكتب العمل" "<span>مستحقات وأجور</span><span>عقود العمل</span><span>مكتب العمل والتسويات</span><span>المحكمة العمالية</span>"
+make_page /debt-collection-execution/ "تحصيل ديون وتنفيذ ومطالبات مالية في الرياض" "تحصيل ديون ومحكمة التنفيذ ومطالبات مالية" "<span>تحصيل الديون</span><span>تنفيذ الأحكام</span><span>سندات لأمر</span><span>مطالبات مالية</span>"
+make_page /trademark-intellectual-property/ "تسجيل العلامات التجارية والملكية الفكرية في الرياض" "تسجيل علامة تجارية وملكية فكرية" "<span>تسجيل العلامات</span><span>حماية الحقوق</span><span>الاعتراضات</span><span>استشارات الملكية الفكرية</span>"
+make_page /family-inheritance/ "أحوال شخصية وطلاق ونفقة وحضانة ومواريث في الرياض" "أحوال شخصية وطلاق ونفقة وحضانة وميراث" "<span>طلاق وخلع ونفقة</span><span>حضانة</span><span>حصر ورثة</span><span>تقسيم التركات</span>"
+make_page /business-commercial-law/ "محامي شركات وقضايا تجارية وعقود وتحكيم في الرياض" "شركات وتجاري وعقود وتحكيم" "<span>تأسيس الشركات</span><span>صياغة العقود</span><span>نزاعات تجارية</span><span>تصفية وإفلاس</span>"
+make_page /real-estate-law/ "محامي عقاري وصياغة وتوثيق عقود في الرياض" "محامي عقاري وتوثيق عقود وصكوك" "<span>نزاعات عقارية</span><span>عقود وإيجارات</span><span>الصكوك</span><span>التوثيق</span>"
+make_page /criminal-specialized/ "قضايا جنائية وخدمات قانونية متخصصة في الرياض" "محامي جنائي وجرائم إلكترونية وأخطاء طبية" "<span>قضايا جنائية</span><span>جرائم إلكترونية</span><span>أخطاء طبية</span><span>مسائل بنكية</span>"
+mkdir -p "$ROOT/privacy"
+cat > "$ROOT/privacy/index.html" <<EOF
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>سياسة الخصوصية | كورت إكسبرت</title><link rel="canonical" href="$DOMAIN/privacy/"><link rel="stylesheet" href="/assets/styles.css"></head><body><main><section><div class="c privacy"><h1>سياسة الخصوصية</h1><p>نجمع الاسم ورقم الجوال ونوع الخدمة وملخص الطلب ومعلومات الإسناد الإعلاني عند توفرها لغرض التواصل وقياس أداء الحملات.</p><h2>الاستخدام</h2><p>تستخدم البيانات لتوجيه الطلب للقسم المناسب والرد عليه وتحسين القياس.</p><h2>التواصل</h2><p>$EMAIL</p><p><a href="/">العودة للرئيسية</a></p></div></section></main></body></html>
+EOF
+cat > "$ROOT/robots.txt" <<EOF
+User-agent: *
+Allow: /
+Sitemap: $DOMAIN/sitemap.xml
+EOF
+cat > "$ROOT/sitemap.xml" <<EOF
+<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>$DOMAIN/</loc></url><url><loc>$DOMAIN/riyadh-lawyer/</loc></url><url><loc>$DOMAIN/legal-consultation/</loc></url><url><loc>$DOMAIN/labor-law/</loc></url><url><loc>$DOMAIN/debt-collection-execution/</loc></url><url><loc>$DOMAIN/trademark-intellectual-property/</loc></url><url><loc>$DOMAIN/family-inheritance/</loc></url><url><loc>$DOMAIN/business-commercial-law/</loc></url><url><loc>$DOMAIN/real-estate-law/</loc></url><url><loc>$DOMAIN/criminal-specialized/</loc></url><url><loc>$DOMAIN/privacy/</loc></url></urlset>
+EOF
 printf '%s\n' "$SHA" > "$ROOT/RELEASE"
-kill "$PID" 2>/dev/null || true
-trap - EXIT
-rm -rf "$TMP" "$ZIP"
+test -s "$ROOT/index.html"
+test -s "$ROOT/riyadh-lawyer/index.html"
+grep -Fq "$GTM" "$ROOT/index.html"
 printf 'CORTS_DEPLOY_OK:%s\n' "$SHA"
