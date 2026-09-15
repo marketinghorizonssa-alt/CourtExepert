@@ -46,7 +46,7 @@ patch_html(){
   cp "$f" "$tmp"
 
   if ! grep -Fq 'favicon-32-20260915.png' "$tmp"; then
-    sed -i 's#<meta name="viewport" content="width=device-width,initial-scale=1">#<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32-20260915.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192-20260915.png"><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-20260915.png"><meta name="theme-color" content="#1b3461">#' "$tmp"
+    sed -i 's#<meta name="viewport" content="width=device-width,initial-scale=1">#<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32-20260915.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192-20260915.png"><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-20260915.png"><meta name="theme-color" content="rgb(27,52,97)">#' "$tmp"
   fi
 
   # Replace the placeholder W with the actual WhatsApp mark, preserving the original link and data-event.
