@@ -1,0 +1,17 @@
+{
+  "market": "Riyadh",
+  "source_sheet": "هيكلة الحملات",
+  "reference_url": "https://corts-e.sa/",
+  "deployment_target": "https://cortsexpert.hositee.com",
+  "pages": [
+    {"slug":"riyadh-lawyer","priority":"P1","ad_groups":["محامي عام","مكتب محاماة ومستشار","تواصل مباشر / الأفضل","الرياض + عام"]},
+    {"slug":"legal-consultation","priority":"P1","ad_groups":["استشارة محامي / مستشار","استشارات عامة / أونلاين"]},
+    {"slug":"labor-law","priority":"P2","ad_groups":["قضايا عمالية ومكتب العمل"]},
+    {"slug":"debt-collection-execution","priority":"P2","ad_groups":["تحصيل ديون وتنفيذ ومطالبات"]},
+    {"slug":"trademark-intellectual-property","priority":"P2","ad_groups":["علامات تجارية وملكية فكرية"]},
+    {"slug":"family-inheritance","priority":"P2/P3","ad_groups":["أحوال شخصية / طلاق / نفقة / حضانة","مواريث وتركات"]},
+    {"slug":"business-commercial-law","priority":"P3","ad_groups":["شركات / تأسيس / تصفية / إفلاس","تجاري وعقود وتحكيم"]},
+    {"slug":"real-estate-law","priority":"P3","ad_groups":["عقارات وتوثيق وصكوك"]},
+    {"slug":"criminal-specialized","priority":"TEST","ad_groups":["جنائي وخدمات قانونية متخصصة"]}
+  ]
+}
