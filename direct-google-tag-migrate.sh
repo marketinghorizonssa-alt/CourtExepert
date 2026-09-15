@@ -34,6 +34,7 @@ rollback(){
 }
 trap rollback EXIT INT TERM HUP
 
+# First-party bridge for the exact three website conversion actions already published in GTM.
 cat > "$ROOT/assets/google-ads-direct.js" <<JS
 (()=>{
 const SEND={lead_form_success:'$DEST/$FORM_LABEL',click_whatsapp:'$DEST/$WA_LABEL',click_call:'$DEST/$CALL_LABEL'};
@@ -41,10 +42,11 @@ let lastKey='',lastAt=0;
 const fire=(ev,url)=>{
   const sendTo=SEND[ev];
   if(!sendTo||typeof window.gtag!=='function'){if(url)location.href=url;return}
-  if(!url){window.gtag('event','conversion',{send_to:sendTo});return}
+  const base={send_to:sendTo,restricted_data_processing:true};
+  if(!url){window.gtag('event','conversion',base);return}
   let moved=false;
   const go=()=>{if(moved)return;moved=true;location.href=url};
-  window.gtag('event','conversion',{send_to:sendTo,event_callback:go,event_timeout:650});
+  window.gtag('event','conversion',{...base,event_callback:go,event_timeout:650});
   setTimeout(go,700);
 };
 document.addEventListener('click',e=>{
@@ -62,16 +64,18 @@ window.CORTS_GTAG_CONVERSION=ev=>fire(ev,'');
 })();
 JS
 
+# Preserve the durable form receiver/dataLayer event. Add direct Ads sending only after the confirmed acknowledgement.
 TMP_APP="$APP.direct"
 sed "s#dl.push({event:'lead_form_success',form_name:'CORTS_WEBSITE_FORM_V1',submission_id,service:p.service,landing_path:location.pathname});#dl.push({event:'lead_form_success',form_name:'CORTS_WEBSITE_FORM_V1',submission_id,service:p.service,landing_path:location.pathname});if(typeof window.CORTS_GTAG_CONVERSION==='function')window.CORTS_GTAG_CONVERSION('lead_form_success');#" "$APP" > "$TMP_APP"
 mv "$TMP_APP" "$APP"
 
+OLD="<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i;f.parentNode.insertBefore(j,f)})(window,document,'script','dataLayer','GTM-M9ZK36MB');</script>"
+NEW="<script async src=\"https://www.googletagmanager.com/gtag/js?id=$DEST\"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','$DEST');</script>"
+
 patch_html(){
   f="$1"
   tmp="$f.direct"
-  cp "$f" "$tmp"
-  sed -i "s#j.src='https://www.googletagmanager.com/gtm.js?id='+i#j.src='https://www.googletagmanager.com/gtag/js?id=$DEST'#" "$tmp"
-  sed -i "s#</script></head>#</script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','$DEST');</script></head>#" "$tmp"
+  awk -v old="$OLD" -v new="$NEW" '{p=index($0,old);if(p){$0=substr($0,1,p-1) new substr($0,p+length(old))}print}' "$f" > "$tmp"
   sed -i 's#<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M9ZK36MB" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>##' "$tmp"
   sed -i "s#<script src=\"/assets/app.js?v=[^\"]*\" defer></script>#<script src=\"/assets/google-ads-direct.js?v=$SHA\" defer></script><script src=\"/assets/app.js?v=$SHA\" defer></script>#" "$tmp"
   mv "$tmp" "$f"
@@ -83,16 +87,18 @@ test -s "$ROOT/assets/google-ads-direct.js"
 grep -Fq "$DEST/$FORM_LABEL" "$ROOT/assets/google-ads-direct.js"
 grep -Fq "$DEST/$WA_LABEL" "$ROOT/assets/google-ads-direct.js"
 grep -Fq "$DEST/$CALL_LABEL" "$ROOT/assets/google-ads-direct.js"
+grep -Fq 'restricted_data_processing:true' "$ROOT/assets/google-ads-direct.js"
 grep -Fq 'event_callback:go' "$ROOT/assets/google-ads-direct.js"
 grep -Fq 'CORTS_WEBSITE_FORM_V1' "$APP"
 grep -Fq 'lead_form_success' "$APP"
 grep -Fq 'CORTS_GTAG_CONVERSION' "$APP"
 grep -Fq 'script.google.com/macros/s/AKfycbztk2fHhEAJeUFjIgkzL7na06sHWsrJVkWqpRbxt2CduJvNeyrQHSMpz8EzfNE4UbQv/exec' "$APP"
-grep -Fq "googletagmanager.com/gtag/js?id=$DEST" "$ROOT/index.html"
+grep -Fq "<script async src=\"https://www.googletagmanager.com/gtag/js?id=$DEST\"></script>" "$ROOT/index.html"
 grep -Fq "gtag('config','$DEST')" "$ROOT/index.html"
 grep -Fq '/assets/google-ads-direct.js' "$ROOT/index.html"
 ! grep -R -Fq 'googletagmanager.com/gtm.js' "$ROOT" --include='*.html'
-! grep -R -Fq 'googletagmanager.com/ns.html?id=GTM-M9ZK36MB' "$ROOT" --include='*.html'
+! grep -R -Fq 'GTM-M9ZK36MB' "$ROOT" --include='*.html'
+! grep -R -Fq "event:'gtm.js'" "$ROOT" --include='*.html'
 APP_HASH_AFTER="$(sha256sum "$APP" | sed 's/ .*//')"
 [ "$APP_HASH_AFTER" != "$APP_HASH_BEFORE" ]
 SUCCESS=1
