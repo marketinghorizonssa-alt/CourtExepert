@@ -6,7 +6,8 @@ DOMAIN="https://cortsexpert.hositee.com"
 BASE="https://raw.githubusercontent.com/marketinghorizonssa-alt/CourtExepert/$SHA/deploy.sh"
 curl -fsSL "$BASE" | sh -s "$SHA"
 
-# Split inheritance/estates from family-law intent.
+# Split inheritance/estates from family-law intent. Always recreate cleanly.
+rm -rf "$ROOT/inheritance-estates"
 cp -R "$ROOT/family-inheritance" "$ROOT/inheritance-estates"
 sed -i \
   -e 's/أحوال شخصية وطلاق ونفقة وحضانة ومواريث في الرياض/محامي مواريث وتركات وتقسيم ميراث في الرياض/g' \
@@ -25,11 +26,11 @@ sed -i \
   "$ROOT/family-inheritance/index.html"
 
 # Split company formation/liquidation from commercial disputes/contracts/arbitration.
+rm -rf "$ROOT/company-law"
 cp -R "$ROOT/business-commercial-law" "$ROOT/company-law"
 sed -i \
   -e 's/محامي شركات وقضايا تجارية وعقود وتحكيم في الرياض/محامي شركات وتأسيس وتصفية وإفلاس في الرياض/g' \
   -e 's/خدمات قانونية للشركات والقضايا التجارية والعقود والتحكيم والتصفية في الرياض./خدمات قانونية للشركات في الرياض تشمل التأسيس والهيكلة والتصفية والإفلاس وفق طبيعة المنشأة والطلب./g' \
-  -e 's/تأسيس الشركات/تأسيس الشركات/g' \
   -e 's/صياغة العقود/هيكلة الشركات/g' \
   -e 's/نزاعات تجارية/تصفية الشركات/g' \
   -e 's/تصفية وإفلاس/إفلاس وإجراءات نظامية/g' \
