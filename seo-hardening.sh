@@ -18,31 +18,38 @@ EOF
 cat > "$ROOT/llms.txt" <<EOF
 # Corts Expert
 
-Corts Expert is a Riyadh legal-services website for campaign landing pages.
+Corts Expert is a Riyadh legal-services website for campaign landing pages. The site is primarily in Arabic and serves people and businesses seeking legal services in Riyadh, Saudi Arabia.
 
-Canonical site: $DOMAIN/
+## Primary pages
+
+- [Home]($DOMAIN/)
+- [Lawyer in Riyadh]($DOMAIN/riyadh-lawyer/)
+- [Legal consultation]($DOMAIN/legal-consultation/)
+- [Labor law]($DOMAIN/labor-law/)
+- [Debt collection and enforcement]($DOMAIN/debt-collection-execution/)
+- [Trademarks and intellectual property]($DOMAIN/trademark-intellectual-property/)
+- [Family law]($DOMAIN/family-inheritance/)
+- [Inheritance and estates]($DOMAIN/inheritance-estates/)
+- [Company law and formation]($DOMAIN/company-law/)
+- [Business, contracts and arbitration]($DOMAIN/business-commercial-law/)
+- [Real-estate law and notarization]($DOMAIN/real-estate-law/)
+- [Criminal and specialized legal services]($DOMAIN/criminal-specialized/)
+
+## Site resources
+
+- [XML sitemap]($DOMAIN/sitemap.xml)
+- [Privacy policy]($DOMAIN/privacy/)
+
+## Contact
+
+Phone: +966556044425
 Market: Riyadh, Saudi Arabia
 Language: Arabic
-Contact phone: +966556044425
-
-Primary service pages:
-- $DOMAIN/riyadh-lawyer/
-- $DOMAIN/legal-consultation/
-- $DOMAIN/labor-law/
-- $DOMAIN/debt-collection-execution/
-- $DOMAIN/trademark-intellectual-property/
-- $DOMAIN/family-inheritance/
-- $DOMAIN/inheritance-estates/
-- $DOMAIN/company-law/
-- $DOMAIN/business-commercial-law/
-- $DOMAIN/real-estate-law/
-- $DOMAIN/criminal-specialized/
-
-Sitemap: $DOMAIN/sitemap.xml
-Privacy: $DOMAIN/privacy/
 EOF
 [ "$(grep -o '<url>' "$ROOT/sitemap.xml" | wc -l)" -eq 13 ]
 grep -Fq 'User-agent: Google-InspectionTool' "$ROOT/robots.txt"
 grep -Fq 'Sitemap: https://cortsexpert.hositee.com/sitemap.xml' "$ROOT/robots.txt"
 test -s "$ROOT/llms.txt"
+grep -Fq '[Home](https://cortsexpert.hositee.com/)' "$ROOT/llms.txt"
+grep -Fq '[XML sitemap](https://cortsexpert.hositee.com/sitemap.xml)' "$ROOT/llms.txt"
 printf 'CORTS_SEO_OK:%s\n' "$SHA"
