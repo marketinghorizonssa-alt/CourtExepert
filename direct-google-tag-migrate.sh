@@ -14,7 +14,6 @@ SUCCESS=0
 APP_HASH_BEFORE="$(sha256sum "$APP" | sed 's/ .*//')"
 [ "$APP_HASH_BEFORE" = "$EXPECTED_APP_HASH" ]
 
-# Back up only the files this migration can change, outside public_html.
 rm -rf "$BACKUP"
 mkdir -p "$BACKUP/assets"
 cp "$APP" "$BACKUP/assets/app.js"
@@ -35,18 +34,34 @@ rollback(){
 }
 trap rollback EXIT INT TERM HUP
 
-# Tiny first-party event bridge. Same Google Ads actions/labels as the published GTM container.
 cat > "$ROOT/assets/google-ads-direct.js" <<JS
 (()=>{
 const SEND={lead_form_success:'$DEST/$FORM_LABEL',click_whatsapp:'$DEST/$WA_LABEL',click_call:'$DEST/$CALL_LABEL'};
 let lastKey='',lastAt=0;
-const fire=ev=>{const sendTo=SEND[ev];if(!sendTo||typeof window.gtag!=='function')return;window.gtag('event','conversion',{send_to:sendTo});};
-document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[data-event]');if(!a)return;const ev=a.dataset.event;if(ev!=='click_whatsapp'&&ev!=='click_call')return;const key=ev+'|'+a.href,now=Date.now();if(key===lastKey&&now-lastAt<1000)return;lastKey=key;lastAt=now;fire(ev);},{capture:true,passive:true});
-window.CORTS_GTAG_CONVERSION=ev=>fire(ev);
+const fire=(ev,url)=>{
+  const sendTo=SEND[ev];
+  if(!sendTo||typeof window.gtag!=='function'){if(url)location.href=url;return}
+  if(!url){window.gtag('event','conversion',{send_to:sendTo});return}
+  let moved=false;
+  const go=()=>{if(moved)return;moved=true;location.href=url};
+  window.gtag('event','conversion',{send_to:sendTo,event_callback:go,event_timeout:650});
+  setTimeout(go,700);
+};
+document.addEventListener('click',e=>{
+  const a=e.target.closest&&e.target.closest('a[data-event]');
+  if(!a)return;
+  const ev=a.dataset.event;
+  if(ev!=='click_whatsapp'&&ev!=='click_call')return;
+  const key=ev+'|'+a.href,now=Date.now();
+  if(key===lastKey&&now-lastAt<1000){e.preventDefault();return}
+  lastKey=key;lastAt=now;
+  e.preventDefault();
+  fire(ev,a.href);
+},{capture:true});
+window.CORTS_GTAG_CONVERSION=ev=>fire(ev,'');
 })();
 JS
 
-# Keep the durable receiver and canonical dataLayer event unchanged; add only a direct Ads send after confirmed acknowledgement.
 TMP_APP="$APP.direct"
 sed "s#dl.push({event:'lead_form_success',form_name:'CORTS_WEBSITE_FORM_V1',submission_id,service:p.service,landing_path:location.pathname});#dl.push({event:'lead_form_success',form_name:'CORTS_WEBSITE_FORM_V1',submission_id,service:p.service,landing_path:location.pathname});if(typeof window.CORTS_GTAG_CONVERSION==='function')window.CORTS_GTAG_CONVERSION('lead_form_success');#" "$APP" > "$TMP_APP"
 mv "$TMP_APP" "$APP"
@@ -55,24 +70,20 @@ patch_html(){
   f="$1"
   tmp="$f.direct"
   cp "$f" "$tmp"
-
-  # Load the Google tag directly instead of loading the GTM runtime first.
   sed -i "s#j.src='https://www.googletagmanager.com/gtm.js?id='+i#j.src='https://www.googletagmanager.com/gtag/js?id=$DEST'#" "$tmp"
   sed -i "s#</script></head>#</script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','$DEST');</script></head>#" "$tmp"
   sed -i 's#<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M9ZK36MB" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>##' "$tmp"
-
-  # The local bridge replaces the GTM Custom HTML click listener and conversion tags.
   sed -i "s#<script src=\"/assets/app.js?v=[^\"]*\" defer></script>#<script src=\"/assets/google-ads-direct.js?v=$SHA\" defer></script><script src=\"/assets/app.js?v=$SHA\" defer></script>#" "$tmp"
   mv "$tmp" "$f"
 }
 find "$ROOT" -maxdepth 2 -type f -name index.html | while IFS= read -r f; do patch_html "$f"; done
 
-# Migration gates: exact destination/labels, one direct Google tag, durable form receiver still intact, GTM runtime gone.
 test "$(find "$ROOT" -maxdepth 2 -type f -name index.html | wc -l)" -eq 13
 test -s "$ROOT/assets/google-ads-direct.js"
 grep -Fq "$DEST/$FORM_LABEL" "$ROOT/assets/google-ads-direct.js"
 grep -Fq "$DEST/$WA_LABEL" "$ROOT/assets/google-ads-direct.js"
 grep -Fq "$DEST/$CALL_LABEL" "$ROOT/assets/google-ads-direct.js"
+grep -Fq 'event_callback:go' "$ROOT/assets/google-ads-direct.js"
 grep -Fq 'CORTS_WEBSITE_FORM_V1' "$APP"
 grep -Fq 'lead_form_success' "$APP"
 grep -Fq 'CORTS_GTAG_CONVERSION' "$APP"
